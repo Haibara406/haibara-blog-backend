@@ -1,136 +1,373 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>欢迎邮件</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新留言通知 - Haibara Blog</title>
     <style type="text/css">
-        /* 媒体查询 */
-        @media screen and (max-width: 740px) {
-            .div_container {
-                font-size: 16px !important;
-            }
-
-            .but-container {
-                margin-top: 1rem !important;
-            }
-
-            .butt_to {
-                width: 150px !important;
-                height: 40px !important;
-                line-height: 40px !important;
-                font-size: 16px !important;
-            }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-
-        @media screen and (max-width: 550px) {
-            .title_container {
-                flex-direction: column !important;
-            }
-
-            .title_container div:nth-of-type(2) {
-                margin-top: .5rem !important;
-            }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
         }
-
-        .butt_to:hover {
+        
+        .email-container {
+            max-width: 650px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .email-header {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            padding: 60px 40px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .email-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="25" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .avatar-container {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 30px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .avatar-container img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            object-fit: cover;
+        }
+        
+        .brand-title {
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .brand-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            font-weight: 400;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .notification-title {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 600;
+            margin-top: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .email-body {
+            padding: 50px 40px;
+        }
+        
+        .welcome-message {
+            text-align: center;
+            background: linear-gradient(135deg, #fff7e6 0%, #ffe4b5 100%);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border-left: 4px solid #fab1a0;
+        }
+        
+        .welcome-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-subtitle {
+            font-size: 14px;
+            color: #718096;
+        }
+        
+        .message-section {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .message-card {
+            background: linear-gradient(135deg, #fff7e6 0%, #ffeaa7 100%);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #fab1a0;
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .message-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid #fab1a0;
+            object-fit: cover;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .message-meta {
+            flex: 1;
+        }
+        
+        .message-author {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+        
+        .message-time {
+            font-size: 13px;
+            color: #718096;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        
+        .message-content {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            color: #4a5568;
+            line-height: 1.7;
+            border: 2px solid #ffe4b5;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .message-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            font-size: 14px;
+            color: #718096;
+        }
+        
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 16px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            min-width: 160px;
+            text-align: center;
+            border: none;
             cursor: pointer;
-            background: linear-gradient(135deg, #f02fc2, #6094ea);
-            color: white;
-            transition: 0.5s;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            color: #2d3748;
+            box-shadow: 0 4px 15px rgba(255, 234, 167, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 234, 167, 0.6);
+        }
+        
+        .email-footer {
+            background: #f7fafc;
+            padding: 30px 40px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .footer-text {
+            font-size: 14px;
+            color: #718096;
+        }
+        
+        /* 响应式设计 */
+        @media screen and (max-width: 640px) {
+            body {
+                padding: 10px;
+            }
+            
+            .email-header {
+                padding: 40px 20px 30px;
+            }
+            
+            .email-body {
+                padding: 30px 20px;
+            }
+            
+            .brand-title {
+                font-size: 24px;
+            }
+            
+            .notification-title {
+                font-size: 20px;
+            }
+            
+            .message-section {
+                padding: 20px;
+            }
+            
+            .message-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .message-meta {
+                text-align: center;
+            }
+            
+            .message-stats {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 280px;
+            }
+            
+            .email-footer {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
-<div>
-    <div class="div_container"
-         style="
-         display: flex;
-         justify-content: center;
-         align-items: center;
-         flex-direction: column;
-         font-size: 20px;
-         color: #333333;
-         border-radius: 1rem;
-         min-height: 100vh;
-         width: 100%;
-         background: linear-gradient(135deg, #f02fc2, #6094ea);
-">
-        <div style="height: 100%;width: 100%;display: flex;flex-direction: column;align-items: center;justify-content: center">
-            <div class="avatar_container" style="width: 150px; height: 150px; margin: 0 auto; padding-top: 2rem;">
-                <img src="http://45.204.4.56:9000/haibara-blog/websiteInfo%2Favatar%2FYasuo.jpg"
-                     alt="头像"
-                     style="width: 100%; height: 100%; border-radius: 40%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);">
+    <div class="email-container">
+        <!-- 邮件头部 -->
+        <div class="email-header">
+            <div class="avatar-container">
+                <img src="http://45.204.4.56:9000/haibara-blog/websiteInfo%2Favatar%2FYasuo.jpg" alt="Haibara Blog Avatar">
             </div>
-            <div class="title_container"
-                 style="
-                 margin-top: 20px;
-                 margin-bottom: 40px;
-                 display: flex;
-                 justify-content: center;
-                 align-items: center;
-            ">
-                <div style="display: flex;flex-direction: column;align-items: center">
-                    <span style="color: #ffffff;font-weight: bold;font-size: 25px;margin-bottom: 20px">Haibara-Blog</span>
-                    <span style="color: #ffffff;font-weight: bold;font-size: 25px">有新的留言</span>
+            <h1 class="brand-title">Haibara Blog</h1>
+            <p class="brand-subtitle">一个精致的个人博客网站</p>
+            <h2 class="notification-title">📝 有新的留言</h2>
+        </div>
+        
+        <!-- 邮件正文 -->
+        <div class="email-body">
+            <!-- 欢迎信息 -->
+            <div class="welcome-message">
+                <div class="welcome-text">🎉 新留言提醒！</div>
+                <div class="welcome-subtitle">又有访客为您的博客留下了精彩的留言</div>
+            </div>
+            
+            <!-- 留言内容 -->
+            <div class="message-section">
+                <div class="section-title">
+                    💬 留言内容
                 </div>
-            </div>
-            <div style="margin: 1rem 0;width: 90%;display: flex;justify-content: center;align-items: center">
-                <div style="
-                width: 95%;
-                height: auto;
-                min-height: 200px;
-                border: 1px solid #E4E7ED;
-                border-radius: 5px;
-                background-color: white;
-            ">
-                    <!-- 头像 名称 -->
-                    <div style="display: flex;justify-content: space-between;align-items: center;padding: 20px">
-                        <div style="display: flex;justify-content: center;align-items: center">
-                            <div class="avatar_container" style="width: 50px; height: 50px; border-radius: 50%;margin-right: 20px">
-                                <img th:src="${avatar}"
-                                     alt="头像"
-                                     style="width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);">
-                            </div>
-                            <div style="font-size: 20px" th:text="${nickname}">
-
-                            </div>
-                        </div>
-                        <div style="color: #999999;font-size: 15px" th:text="${time}">
-
+                
+                <div class="message-card">
+                    <div class="message-header">
+                        <img th:src="${avatar}" alt="用户头像" class="message-avatar">
+                        <div class="message-meta">
+                            <div class="message-author" th:text="${nickname}">访客昵称</div>
+                            <div class="message-time" th:text="${time}">留言时间</div>
                         </div>
                     </div>
-                    <hr style="background-color: #DCDFE6; height: 1px; border: none;margin: 0">
-                    <!-- 内容 -->
-                    <div style="padding: 20px" th:text="${content}">
-
+                    
+                    <div class="message-content" th:text="${content}">
+                        这是一条精彩的留言内容，感谢您分享的精彩内容...
+                    </div>
+                    
+                    <div class="message-stats">
+                        <span>📍 来自留言板</span>
+                        <span>👤 访客留言</span>
                     </div>
                 </div>
             </div>
-            <div class="but-container"
-                 style="display: flex; justify-content: space-around; align-items: center; margin: 2rem 0;">
-                <a th:href="${toUrl}">
-                    <div class="butt_to"
-                         style="width: 200px; height: 50px; line-height: 50px; text-align: center; font-size: 20px; font-weight: bold; color: #333333; background: white; border-radius: 1rem; margin: 0 auto;"
-                         onmouseover="this.style.background='linear-gradient(135deg, #f02fc2, #6094ea)'; this.style.color='white'; this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.4)'; this.style.transition='0.5s';"
-                         onmouseout="this.style.background='white'; this.style.color='#333333'; this.style.boxShadow='none';">
-                        前往查看
-                    </div>
-                </a>
+            
+            <!-- 按钮组 -->
+            <div class="button-container">
+                <a th:href="${toUrl}" class="btn btn-primary">立即查看留言</a>
             </div>
-            <div style="text-align: center;padding-bottom: 1rem;font-size: 15px">此为系统邮件，请勿回复。</div>
+        </div>
+        
+        <!-- 邮件底部 -->
+        <div class="email-footer">
+            <p class="footer-text">
+                此为系统自动发送的邮件，请勿回复<br>
+                如有疑问，请访问我们的网站获取帮助
+            </p>
         </div>
     </div>
-</div>
-<script>
-    // 针对旧版 Outlook 的特殊处理
-    if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0) {
-        var elements = document.querySelectorAll('.butt_to');
-        for (var i = 0; i < elements.length; i++) {
-            elements[i].style.width = '200px';
-            elements[i].style.height = '50px';
-        }
-    }
-</script>
 </body>
 </html>

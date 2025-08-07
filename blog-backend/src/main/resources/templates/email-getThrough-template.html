@@ -1,99 +1,411 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>欢迎邮件</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>友链申请通过 - Haibara Blog</title>
     <style type="text/css">
-        /* 媒体查询 */
-        @media screen and (max-width: 740px) {
-            .div_container {
-                font-size: 16px !important;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #55efc4 0%, #00b894 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .email-container {
+            max-width: 650px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .email-header {
+            background: linear-gradient(135deg, #55efc4 0%, #00b894 100%);
+            padding: 60px 40px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .email-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="25" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .avatar-container {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 30px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .avatar-container img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            object-fit: cover;
+        }
+        
+        .brand-title {
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .brand-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            font-weight: 400;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .success-title {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 600;
+            margin-top: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .email-body {
+            padding: 50px 40px;
+            text-align: center;
+        }
+        
+        .congratulations-section {
+            background: linear-gradient(135deg, #d1f2eb 0%, #a3e4d7 100%);
+            border-radius: 16px;
+            padding: 40px 30px;
+            margin-bottom: 40px;
+            border: 1px solid #52c41a;
+        }
+        
+        .congrats-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #00b894;
+            margin-bottom: 15px;
+        }
+        
+        .congrats-message {
+            font-size: 16px;
+            color: #2d3748;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .celebration-emoji {
+            font-size: 48px;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
             }
-
-            .but-container {
-                margin-top: 1rem !important;
+            40% {
+                transform: translateY(-10px);
             }
-
-            .butt_to {
-                width: 150px !important;
-                height: 40px !important;
-                line-height: 40px !important;
-                font-size: 16px !important;
+            60% {
+                transform: translateY(-5px);
             }
         }
-
-        @media screen and (max-width: 550px) {
-            .title_container {
-                flex-direction: column !important;
-            }
-
-            .title_container div:nth-of-type(2) {
-                margin-top: .5rem !important;
-            }
+        
+        .next-steps {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            text-align: left;
         }
-
-        .butt_to:hover {
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .steps-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .step-item {
+            background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            border-left: 4px solid #55efc4;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .step-number {
+            background: #55efc4;
+            color: #ffffff;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .step-text {
+            font-size: 14px;
+            color: #4a5568;
+            flex: 1;
+        }
+        
+        .achievement-badge {
+            background: linear-gradient(135deg, #fff7e6 0%, #ffe4b5 100%);
+            border: 2px solid #ffa502;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .badge-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .badge-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #e17055;
+        }
+        
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 16px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            min-width: 160px;
+            text-align: center;
+            border: none;
             cursor: pointer;
-            background: linear-gradient(135deg, #f02fc2, #6094ea);
-            color: white;
-            transition: 0.5s;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #55efc4 0%, #00b894 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(85, 239, 196, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(85, 239, 196, 0.6);
+        }
+        
+        .btn-secondary {
+            background: #ffffff;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .email-footer {
+            background: #f7fafc;
+            padding: 30px 40px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .footer-text {
+            font-size: 14px;
+            color: #718096;
+        }
+        
+        /* 响应式设计 */
+        @media screen and (max-width: 640px) {
+            body {
+                padding: 10px;
+            }
+            
+            .email-header {
+                padding: 40px 20px 30px;
+            }
+            
+            .email-body {
+                padding: 30px 20px;
+            }
+            
+            .brand-title {
+                font-size: 24px;
+            }
+            
+            .success-title {
+                font-size: 22px;
+            }
+            
+            .congratulations-section {
+                padding: 30px 20px;
+            }
+            
+            .next-steps {
+                padding: 20px;
+            }
+            
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 280px;
+            }
+            
+            .email-footer {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
-<div>
-    <div class="div_container"
-         style="text-align: center; font-size: 20px; color: #333333; border-radius: 1rem; min-height: 100vh; padding: 0 2rem; background: linear-gradient(135deg, #f02fc2, #6094ea);">
-        <div class="avatar_container" style="width: 150px; height: 150px; margin: 0 auto; padding-top: 2rem;">
-            <img src="http://45.204.4.56:9000/haibara-blog/websiteInfo%2Favatar%2FYasuo.jpg"
-                 alt="头像"
-                 style="width: 100%; height: 100%; border-radius: 40%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);">
-        </div>
-        <div class="title_container"
-             style="margin-top: 20px; display: flex; justify-content: center; align-items: center;">
-            <div>
-                欢迎访问 <span style="color: #0653e8;font-weight: bold;font-size: 25px">Haibara-Blog</span>
+    <div class="email-container">
+        <!-- 邮件头部 -->
+        <div class="email-header">
+            <div class="success-icon">✅</div>
+            <div class="avatar-container">
+                <img src="http://45.204.4.56:9000/haibara-blog/websiteInfo%2Favatar%2FYasuo.jpg" alt="Haibara Blog Avatar">
             </div>
-            <div style="margin-left: 10px;">
-                &nbsp;&nbsp; 一个精致的个人博客网站
+            <h1 class="brand-title">Haibara Blog</h1>
+            <p class="brand-subtitle">一个精致的个人博客网站</p>
+            <h2 class="success-title">🎉 友链申请通过！</h2>
+        </div>
+        
+        <!-- 邮件正文 -->
+        <div class="email-body">
+            <!-- 恭喜信息 -->
+            <div class="congratulations-section">
+                <div class="celebration-emoji">🎊</div>
+                <div class="congrats-title">恭喜您！</div>
+                <div class="congrats-message">
+                    您的友链申请已经通过审核！<br>
+                    现在您的网站已经出现在我们的友链页面中了
+                </div>
+            </div>
+            
+            <!-- 成就徽章 -->
+            <div class="achievement-badge">
+                <div class="badge-icon">🏆</div>
+                <div class="badge-text">友链伙伴 · 成就解锁</div>
+            </div>
+            
+            <!-- 下一步操作 -->
+            <div class="next-steps">
+                <div class="section-title">
+                    🚀 接下来您可以：
+                </div>
+                
+                <ul class="steps-list">
+                    <li class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-text">访问我们的友链页面，查看您的网站展示</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-text">在您的网站上添加我们的友链，建立双向连接</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-text">与我们的博客社区互动，分享精彩内容</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-text">持续更新您的网站，保持活跃状态</div>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- 按钮组 -->
+            <div class="button-container">
+                <a th:href="${toUrl}" class="btn btn-primary">🔗 查看友链页面</a>
+                <a th:href="${openSourceAddress}" class="btn btn-secondary">⭐ 给个 Star</a>
             </div>
         </div>
-        <div style="font-weight: bold;color: black;font-size: 22px;margin:2rem 0">
-            您的友链申请已经通过
+        
+        <!-- 邮件底部 -->
+        <div class="email-footer">
+            <p class="footer-text">
+                此为系统自动发送的邮件，请勿回复<br>
+                感谢您的支持，期待与您的长期友好合作！
+            </p>
         </div>
-        <div>快去看看吧o(*￣▽￣*)ブ</div>
-        <div class="but-container"
-             style="display: flex; justify-content: space-around; align-items: center; margin-top: 2rem;">
-            <a th:href="${toUrl}">
-                <div class="butt_to"
-                     style="width: 200px; height: 50px; line-height: 50px; text-align: center; font-size: 20px; font-weight: bold; color: #333333; background: white; border-radius: 1rem; margin: 0 auto;"
-                     onmouseover="this.style.background='linear-gradient(135deg, #f02fc2, #6094ea)'; this.style.color='white'; this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.4)'; this.style.transition='0.5s';"
-                     onmouseout="this.style.background='white'; this.style.color='#333333'; this.style.boxShadow='none';">
-                    立即前往
-                </div>
-            </a>
-            <a th:href="${openSourceAddress}">
-                <div class="butt_to"
-                     style="width: 200px; height: 50px; line-height: 50px; text-align: center; font-size: 20px; font-weight: bold; color: #333333; background: white; border-radius: 1rem; margin: 0 auto;"
-                     onmouseover="this.style.background='linear-gradient(135deg, #f02fc2, #6094ea)'; this.style.color='white'; this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.4)'; this.style.transition='0.5s';"
-                     onmouseout="this.style.background='white'; this.style.color='#333333'; this.style.boxShadow='none';">
-                    给个Star
-                </div>
-            </a>
-        </div>
-        <div style="text-align: center;padding: 1rem 0;font-size: 15px">此为系统邮件，请勿回复。</div>
     </div>
-</div>
-<script>
-    // 针对旧版 Outlook 的特殊处理
-    if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0) {
-        var elements = document.querySelectorAll('.butt_to');
-        for (var i = 0; i < elements.length; i++) {
-            elements[i].style.width = '200px';
-            elements[i].style.height = '50px';
-        }
-    }
-</script>
 </body>
 </html>
