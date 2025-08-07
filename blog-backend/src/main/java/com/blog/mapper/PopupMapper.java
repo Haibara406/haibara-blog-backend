@@ -1,7 +1,7 @@
 package com.blog.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.blog.domain.entity.SysPopup;
+import com.blog.domain.entity.Popup;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -10,5 +10,5 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2025/8/7
  */
 @Mapper
-public interface SysPopupMapper extends BaseMapper<SysPopup> {
+public interface PopupMapper extends BaseMapper<Popup> {
 }

@@ -2,7 +2,6 @@ package com.blog.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -25,7 +24,7 @@ import java.util.Date;
 @NoArgsConstructor
 @TableName("sys_popup")
 @Schema(description = "弹窗管理实体")
-public class SysPopup implements BaseData {
+public class Popup implements BaseData {
 
     @Schema(description = "弹窗ID", example = "1")
     private Long id;
