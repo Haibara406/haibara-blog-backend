@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.blog.domain.BaseData;
 
+import java.sql.Time;
 import java.util.Date;
 
 /**
@@ -47,14 +48,17 @@ public class SysPopup implements BaseData {
     @Schema(description = "目标用户：1-所有用户，2-登录用户，3-游客", example = "1", allowableValues = {"1", "2", "3"})
     private Integer targetUsers;
 
-    @Schema(description = "时间段：0-全天，1-7-12点，2-12-18点，3-18-24点，4-0-7点", example = "0", allowableValues = {"0", "1", "2", "3", "4"})
-    private Integer timeRange;
+    @Schema(description = "开始日期(为空则立即生效)", example = "2025-08-07 14:30:00")
+    private Date startDate;
 
-    @Schema(description = "开始时间(为空则立即生效)", example = "2025-08-07 14:30:00")
-    private Date startTime;
+    @Schema(description = "结束日期(为空则永久有效)", example = "2025-12-31 23:59:59")
+    private Date endDate;
 
-    @Schema(description = "结束时间(为空则永久有效)", example = "2025-12-31 23:59:59")
-    private Date endTime;
+    @Schema(description = "开始时间(若与结束时间都为null则全天都能看到)", example = "09:00:00")
+    private Time startTime;
+
+    @Schema(description = "结束时间(若与开始时间都为null则全天都能看到)", example = "18:00:00")
+    private Time endTime;
 
     @Schema(description = "显示模式：1-每次刷新，2-会话期间一次，3-每日一次，4-永久一次", example = "1", allowableValues = {"1", "2", "3", "4"})
     private Integer displayMode;
