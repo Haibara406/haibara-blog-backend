@@ -92,9 +92,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private LeaveWordMapper leaveWordMapper;
 
     @Resource
-    private ChatGptMapper chatGptMapper;
-
-    @Resource
     private LinkMapper linkMapper;
 
     @Resource
@@ -543,8 +540,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             treeHoleMapper.delete(new LambdaQueryWrapper<TreeHole>().in(TreeHole::getUserId, ids));
             // 删除用户留言
             leaveWordMapper.delete(new LambdaQueryWrapper<LeaveWord>().in(LeaveWord::getUserId, ids));
-            // TODO 删除用户聊天记录 - 临时注释，因为表不存在
-            // chatGptMapper.delete(new LambdaQueryWrapper<ChatGpt>().in(ChatGpt::getUserId, ids));
             // 删除用户友链
             linkMapper.delete(new LambdaQueryWrapper<Link>().in(Link::getUserId, ids));
             return ResponseResult.success();

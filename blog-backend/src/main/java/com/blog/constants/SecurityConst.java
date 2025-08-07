@@ -39,10 +39,10 @@ public class SecurityConst {
      */
     public static final String LEAVE_WORD_CHECK = "/leaveWord/auth/**";
 
-    /**
-     * 需要校验的gpt聊天接口
-     */
-    public static final String CHAT_GPT_CHECK = "/chatGpt/auth/**";
+//    /**
+//     * 需要校验的gpt聊天接口
+//     */
+//    public static final String CHAT_GPT_CHECK = "/chatGpt/auth/**";
 
     /**
      * 需要校验的友链接口
@@ -79,7 +79,6 @@ public class SecurityConst {
             FAVORITE_CHECK,
             LIKE_CHECK,
             LEAVE_WORD_CHECK,
-            CHAT_GPT_CHECK,
             LINK_CHECK,
             MENU_CHECK,
             ROLE_CHECK,
