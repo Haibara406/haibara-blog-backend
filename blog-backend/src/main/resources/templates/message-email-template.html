@@ -95,6 +95,37 @@
             z-index: 2;
         }
         
+        .message-emoji {
+            font-size: 28px;
+            display: inline-block;
+            animation: message-shake 2s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes message-shake {
+            0%, 100% {
+                transform: translateX(0) rotate(0deg);
+            }
+            10% {
+                transform: translateX(-3px) rotate(-2deg);
+            }
+            20% {
+                transform: translateX(3px) rotate(2deg);
+            }
+            30% {
+                transform: translateX(-2px) rotate(-1deg);
+            }
+            40% {
+                transform: translateX(2px) rotate(1deg);
+            }
+            50% {
+                transform: translateX(-1px) rotate(-0.5deg);
+            }
+            60% {
+                transform: translateX(1px) rotate(0.5deg);
+            }
+        }
+        
         .email-body {
             padding: 50px 40px;
         }
@@ -318,7 +349,7 @@
             </div>
             <h1 class="brand-title">Haibara Blog</h1>
             <p class="brand-subtitle">一个精致的个人博客网站</p>
-            <h2 class="notification-title">📝 有新的留言</h2>
+            <h2 class="notification-title"><span class="message-emoji">📝</span>有新的留言</h2>
         </div>
         
         <!-- 邮件正文 -->

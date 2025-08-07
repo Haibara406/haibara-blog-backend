@@ -95,6 +95,28 @@
             z-index: 2;
         }
         
+        .comment-emoji {
+            font-size: 28px;
+            display: inline-block;
+            animation: comment-wiggle 2.5s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes comment-wiggle {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+            25% {
+                transform: rotate(-10deg) scale(1.1);
+            }
+            50% {
+                transform: rotate(10deg) scale(1.05);
+            }
+            75% {
+                transform: rotate(-5deg) scale(1.1);
+            }
+        }
+        
         .email-body {
             padding: 50px 40px;
         }
@@ -297,7 +319,7 @@
             </div>
             <h1 class="brand-title">Haibara Blog</h1>
             <p class="brand-subtitle">一个精致的个人博客网站</p>
-            <h2 class="notification-title" th:text="${type == 1 ? '📝 文章有新的评论' : '💬 留言有新的评论'}">📝 文章有新的评论</h2>
+            <h2 class="notification-title"><span class="comment-emoji" th:text="${type == 1 ? '📝' : '💬'}">📝</span><span th:text="${type == 1 ? '文章有新的评论' : '留言有新的评论'}">文章有新的评论</span></h2>
         </div>
         
         <!-- 邮件正文 -->

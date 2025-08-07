@@ -98,6 +98,28 @@
             margin-bottom: 20px;
         }
         
+        .email-emoji {
+            font-size: 32px;
+            display: inline-block;
+            animation: email-fly 3s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes email-fly {
+            0%, 100% {
+                transform: translateX(0) rotate(0deg);
+            }
+            25% {
+                transform: translateX(10px) rotate(5deg);
+            }
+            50% {
+                transform: translateX(-5px) rotate(-3deg);
+            }
+            75% {
+                transform: translateX(8px) rotate(2deg);
+            }
+        }
+        
         .email-reset-subtitle {
             font-size: 16px;
             color: #718096;
@@ -276,7 +298,7 @@
         
         <!-- 邮件正文 -->
         <div class="email-body">
-            <h2 class="email-reset-message">📧 邮箱重置</h2>
+            <h2 class="email-reset-message"><span class="email-emoji">📧</span>邮箱重置</h2>
             <p class="email-reset-subtitle">我们收到了您的邮箱重置请求，请使用下面的验证码完成重置</p>
             
             <!-- 验证码卡片 -->

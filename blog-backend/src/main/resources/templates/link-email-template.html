@@ -95,6 +95,31 @@
             z-index: 2;
         }
         
+        .link-emoji {
+            font-size: 28px;
+            display: inline-block;
+            animation: link-swing 2.5s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes link-swing {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+            20% {
+                transform: rotate(15deg);
+            }
+            40% {
+                transform: rotate(-10deg);
+            }
+            60% {
+                transform: rotate(5deg);
+            }
+            80% {
+                transform: rotate(-2deg);
+            }
+        }
+        
         .email-body {
             padding: 50px 40px;
         }
@@ -319,7 +344,7 @@
             </div>
             <h1 class="brand-title">Haibara Blog</h1>
             <p class="brand-subtitle">一个精致的个人博客网站</p>
-            <h2 class="notification-title">🔗 新的友链申请</h2>
+            <h2 class="notification-title"><span class="link-emoji">🔗</span>新的友链申请</h2>
         </div>
         
         <!-- 邮件正文 -->

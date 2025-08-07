@@ -95,6 +95,31 @@
             z-index: 2;
         }
         
+        .reply-emoji {
+            font-size: 28px;
+            display: inline-block;
+            animation: reply-spin 3s linear infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes reply-spin {
+            0% {
+                transform: rotate(0deg) scale(1);
+            }
+            25% {
+                transform: rotate(90deg) scale(1.1);
+            }
+            50% {
+                transform: rotate(180deg) scale(1);
+            }
+            75% {
+                transform: rotate(270deg) scale(1.1);
+            }
+            100% {
+                transform: rotate(360deg) scale(1);
+            }
+        }
+        
         .email-body {
             padding: 50px 40px;
         }
@@ -342,7 +367,7 @@
             </div>
             <h1 class="brand-title">Haibara Blog</h1>
             <p class="brand-subtitle">一个精致的个人博客网站</p>
-            <h2 class="notification-title" th:text="${type == 1 ? '🔁 文章评论有新的回复' : '🔁 留言评论有新的回复'}">🔁 文章评论有新的回复</h2>
+            <h2 class="notification-title"><span class="reply-emoji">🔁</span><span th:text="${type == 1 ? '文章评论有新的回复' : '留言评论有新的回复'}">文章评论有新的回复</span></h2>
         </div>
         
         <!-- 邮件正文 -->

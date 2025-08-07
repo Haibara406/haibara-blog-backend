@@ -99,6 +99,31 @@
             margin-bottom: 20px;
         }
         
+        .welcome-emoji {
+            font-size: 32px;
+            display: inline-block;
+            animation: welcome-bounce 2s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes welcome-bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            10% {
+                transform: translateY(-8px) rotate(-5deg);
+            }
+            30% {
+                transform: translateY(-5px) rotate(5deg);
+            }
+            40% {
+                transform: translateY(-3px) rotate(-3deg);
+            }
+            60% {
+                transform: translateY(-2px) rotate(2deg);
+            }
+        }
+        
         .welcome-subtitle {
             font-size: 16px;
             color: #718096;
@@ -277,7 +302,7 @@
         
         <!-- 邮件正文 -->
         <div class="email-body">
-            <h2 class="welcome-message">🎉 欢迎注册！</h2>
+            <h2 class="welcome-message"><span class="welcome-emoji">🎉</span>欢迎注册！</h2>
             <p class="welcome-subtitle">感谢您选择 Haibara Blog，让我们一起开启精彩的博客之旅</p>
             
             <!-- 验证码卡片 -->
