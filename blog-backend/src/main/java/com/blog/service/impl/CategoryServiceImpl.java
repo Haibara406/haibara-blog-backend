@@ -3,6 +3,7 @@ package com.blog.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.blog.constants.FunctionConst;
+import com.blog.constants.RedisConst;
 import com.blog.domain.dto.CategoryDTO;
 import com.blog.domain.dto.SearchCategoryDTO;
 import com.blog.domain.entity.Article;
@@ -12,6 +13,7 @@ import com.blog.domain.vo.CategoryVO;
 import com.blog.mapper.ArticleMapper;
 import com.blog.mapper.CategoryMapper;
 import com.blog.service.CategoryService;
+import com.blog.utils.RedisCache;
 import com.blog.utils.StringUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -37,6 +40,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     @Resource
     private CategoryMapper categoryMapper;
 
+    @Resource
+    private RedisCache redisCache;
+
 
     /**
      * 查询所有分类
@@ -45,6 +51,32 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
      */
     @Override
     public List<CategoryVO> listAllCategory() {
+        // 1. 先尝试从Redis获取
+        List<CategoryVO> cachedCategories = redisCache.getCacheObject(RedisConst.CATEGORY_LIST);
+        if (cachedCategories != null && !cachedCategories.isEmpty()) {
+            log.debug("从Redis缓存获取分类列表，数量: {}", cachedCategories.size());
+            return cachedCategories;
+        }
+
+        // 2. Redis没有，说明缓存可能过期或丢失，重新加载并缓存
+        log.warn("分类缓存未命中，重新从数据库加载并缓存");
+        List<CategoryVO> categories = listAllCategoryFromDB();
+
+        // 3. 缓存到Redis（设置24小时过期）
+        if (!categories.isEmpty()) {
+            redisCache.setCacheObject(RedisConst.CATEGORY_LIST, categories, 24, java.util.concurrent.TimeUnit.HOURS);
+            log.debug("分类数据已重新缓存到Redis，数量: {}", categories.size());
+        }
+
+        return categories;
+    }
+
+    /**
+     * 从数据库查询所有分类（不走缓存）
+     * @return 分类列表
+     */
+    @Override
+    public List<CategoryVO> listAllCategoryFromDB() {
         List<Category> categories = this.query().list();
 
         if (categories.isEmpty()) {
@@ -69,7 +101,12 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     @Override
     public ResponseResult<Void> addCategory(CategoryDTO categoryDTO) {
         categoryDTO.setId(null);
-        if (this.save(categoryDTO.asViewObject(Category.class))) return ResponseResult.success();
+        if (this.save(categoryDTO.asViewObject(Category.class))) {
+            // 清除分类列表缓存
+            redisCache.deleteObject(RedisConst.CATEGORY_LIST);
+            log.debug("新增分类成功，已清除缓存");
+            return ResponseResult.success();
+        }
         return ResponseResult.failure();
     }
 
@@ -119,8 +156,16 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     @Transactional
     @Override
     public ResponseResult<Void> addOrUpdateCategory(CategoryDTO categoryDTO) {
-        if (this.saveOrUpdate(categoryDTO.asViewObject(Category.class))) return ResponseResult.success();
-        return ResponseResult.failure();
+        ResponseResult<Void> result;
+        if (this.saveOrUpdate(categoryDTO.asViewObject(Category.class))) {
+            result = ResponseResult.success();
+            // 清除分类列表缓存
+            redisCache.deleteObject(RedisConst.CATEGORY_LIST);
+            log.debug("分类数据变更，已清除缓存");
+        } else {
+            result = ResponseResult.failure();
+        }
+        return result;
     }
 
     /**
@@ -135,7 +180,12 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         Long count = articleMapper.selectCount(new LambdaQueryWrapper<Article>().in(Article::getCategoryId, ids));
         if (count > 0) return ResponseResult.failure(FunctionConst.CATEGORY_EXIST_ARTICLE);
         // 执行删除
-        if (this.removeByIds(ids)) return ResponseResult.success();
+        if (this.removeByIds(ids)) {
+            // 清除分类列表缓存
+            redisCache.deleteObject(RedisConst.CATEGORY_LIST);
+            log.debug("分类删除成功，已清除缓存");
+            return ResponseResult.success();
+        }
         return ResponseResult.failure();
     }
 

@@ -4,11 +4,15 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.blog.constants.RedisConst;
 import com.blog.constants.SQLConst;
 import com.blog.domain.entity.*;
+import com.blog.domain.vo.CategoryVO;
+import com.blog.domain.vo.TagVO;
 import com.blog.enums.CommentEnum;
 import com.blog.enums.FavoriteEnum;
 import com.blog.enums.LikeEnum;
 import com.blog.mapper.*;
+import com.blog.service.CategoryService;
 import com.blog.service.RedisService;
+import com.blog.service.TagService;
 import com.blog.utils.RedisCache;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +22,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -47,6 +52,12 @@ public class RedisServiceImpl implements RedisService {
 
     @Resource
     private BlackListMapper blackListMapper;
+
+    @Resource
+    private CategoryService categoryService;
+
+    @Resource
+    private TagService tagService;
 
     @Override
     public void articleCountClear() {
@@ -184,5 +195,53 @@ public class RedisServiceImpl implements RedisService {
         } else {
             log.info("--------没有黑名单信息，无法初始化--------");
         }
+    }
+
+    @Override
+    public void preloadCategories() {
+        log.info("--------开始预热分类缓存--------");
+        try {
+            List<CategoryVO> categories = reloadCategories();
+            log.info("--------分类缓存预热完成，缓存数量: {}--------", categories.size());
+        } catch (Exception e) {
+            log.error("--------分类缓存预热失败--------", e);
+        }
+    }
+
+    @Override
+    public void preloadTags() {
+        log.info("--------开始预热标签缓存--------");
+        try {
+            List<TagVO> tags = reloadTags();
+            log.info("--------标签缓存预热完成，缓存数量: {}--------", tags.size());
+        } catch (Exception e) {
+            log.error("--------标签缓存预热失败--------", e);
+        }
+    }
+
+    @Override
+    public List<CategoryVO> reloadCategories() {
+        log.debug("--------从数据库重新加载分类数据--------");
+        // 调用CategoryService的原始查询方法（不走缓存）
+        List<CategoryVO> categories = categoryService.listAllCategoryFromDB();
+
+        // 缓存到Redis（设置24小时过期）
+        redisCache.setCacheObject(RedisConst.CATEGORY_LIST, categories, 24, TimeUnit.HOURS);
+        log.debug("--------分类数据已缓存到Redis，数量: {}--------", categories.size());
+
+        return categories;
+    }
+
+    @Override
+    public List<TagVO> reloadTags() {
+        log.debug("--------从数据库重新加载标签数据--------");
+        // 调用TagService的原始查询方法（不走缓存）
+        List<TagVO> tags = tagService.listAllTagFromDB();
+
+        // 缓存到Redis（设置24小时过期）
+        redisCache.setCacheObject(RedisConst.TAG_LIST, tags, 24, TimeUnit.HOURS);
+        log.debug("--------标签数据已缓存到Redis，数量: {}--------", tags.size());
+
+        return tags;
     }
 }

@@ -56,4 +56,10 @@ public interface TagService extends IService<Tag> {
      * @return 是否成功
      */
     ResponseResult<Void> deleteTagByIds(List<Long> ids);
+
+    /**
+     * 从数据库查询所有标签（不走缓存）
+     * @return 标签列表
+     */
+    List<TagVO> listAllTagFromDB();
 }

@@ -57,4 +57,10 @@ public interface CategoryService extends IService<Category> {
      * @return 是否成功
      */
     ResponseResult<Void> deleteCategoryByIds(List<Long> ids);
+
+    /**
+     * 从数据库查询所有分类（不走缓存）
+     * @return 分类列表
+     */
+    List<CategoryVO> listAllCategoryFromDB();
 }

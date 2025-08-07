@@ -84,4 +84,14 @@ public class RedisConst {
      * 缓存黑名单--ip
      */
     public static final String BLACK_LIST_IP_KEY = "blackList:ip:";
+
+    /**
+     * 分类列表缓存
+     */
+    public static final String CATEGORY_LIST = "category:list";
+
+    /**
+     * 标签列表缓存
+     */
+    public static final String TAG_LIST = "tag:list";
 }

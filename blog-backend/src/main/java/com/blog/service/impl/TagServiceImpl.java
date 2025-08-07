@@ -3,6 +3,7 @@ package com.blog.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.blog.constants.FunctionConst;
+import com.blog.constants.RedisConst;
 import com.blog.domain.dto.SearchTagDTO;
 import com.blog.domain.dto.TagDTO;
 import com.blog.domain.entity.ArticleTag;
@@ -12,6 +13,7 @@ import com.blog.domain.vo.TagVO;
 import com.blog.mapper.ArticleTagMapper;
 import com.blog.mapper.TagMapper;
 import com.blog.service.TagService;
+import com.blog.utils.RedisCache;
 import com.blog.utils.StringUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -37,6 +40,9 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     @Resource
     private TagMapper tagMapper;
 
+    @Resource
+    private RedisCache redisCache;
+
 
     /**
      * 查询所有标签
@@ -44,6 +50,32 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
      */
     @Override
     public List<TagVO> listAllTag() {
+        // 1. 先尝试从Redis获取
+        List<TagVO> cachedTags = redisCache.getCacheObject(RedisConst.TAG_LIST);
+        if (cachedTags != null && !cachedTags.isEmpty()) {
+            log.debug("从Redis缓存获取标签列表，数量: {}", cachedTags.size());
+            return cachedTags;
+        }
+
+        // 2. Redis没有，说明缓存可能过期或丢失，重新加载并缓存
+        log.warn("标签缓存未命中，重新从数据库加载并缓存");
+        List<TagVO> tags = listAllTagFromDB();
+
+        // 3. 缓存到Redis（设置24小时过期）
+        if (!tags.isEmpty()) {
+            redisCache.setCacheObject(RedisConst.TAG_LIST, tags, 24, java.util.concurrent.TimeUnit.HOURS);
+            log.debug("标签数据已重新缓存到Redis，数量: {}", tags.size());
+        }
+
+        return tags;
+    }
+
+    /**
+     * 从数据库查询所有标签（不走缓存）
+     * @return 标签列表
+     */
+    @Override
+    public List<TagVO> listAllTagFromDB() {
         List<Tag> tags = this.query().list();
 
         if (tags.isEmpty()) {
@@ -67,7 +99,12 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
      */
     @Override
     public ResponseResult<Void> addTag(TagDTO tagDTO) {
-        if (this.save(tagDTO.asViewObject(Tag.class))) return ResponseResult.success();
+        if (this.save(tagDTO.asViewObject(Tag.class))) {
+            // 清除标签列表缓存
+            redisCache.deleteObject(RedisConst.TAG_LIST);
+            log.debug("新增标签成功，已清除缓存");
+            return ResponseResult.success();
+        }
         return ResponseResult.failure();
     }
 
@@ -117,7 +154,12 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     @Transactional
     @Override
     public ResponseResult<Void> addOrUpdateTag(TagDTO tagDTO) {
-        if (this.saveOrUpdate(tagDTO.asViewObject(Tag.class))) return ResponseResult.success();
+        if (this.saveOrUpdate(tagDTO.asViewObject(Tag.class))) {
+            // 清除标签列表缓存
+            redisCache.deleteObject(RedisConst.TAG_LIST);
+            log.debug("标签数据变更，已清除缓存");
+            return ResponseResult.success();
+        }
         return ResponseResult.failure();
     }
 
@@ -133,7 +175,12 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         Long count = articleTagMapper.selectCount(new LambdaQueryWrapper<ArticleTag>().in(ArticleTag::getTagId, ids));
         if (count > 0) return ResponseResult.failure(FunctionConst.TAG_EXIST_ARTICLE);
         // 执行删除
-        if (this.removeByIds(ids)) return ResponseResult.success();
+        if (this.removeByIds(ids)) {
+            // 清除标签列表缓存
+            redisCache.deleteObject(RedisConst.TAG_LIST);
+            log.debug("标签删除成功，已清除缓存");
+            return ResponseResult.success();
+        }
         return ResponseResult.failure();
     }
 
