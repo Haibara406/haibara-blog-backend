@@ -6,6 +6,7 @@ import com.blog.domain.request.oauth.GiteeBody;
 import com.blog.domain.request.oauth.GithubBody;
 import com.blog.enums.RegisterOrLoginTypeEnum;
 import com.blog.service.OauthService;
+import com.xkcoding.http.config.HttpConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -189,6 +190,9 @@ public class OauthController {
                 .clientId(giteeBody.getClientId())
                 .clientSecret(giteeBody.getClientSecret())
                 .redirectUri(giteeBody.getRedirectUri())
+                .httpConfig(HttpConfig.builder()
+                        .timeout(60000) // 60秒超时
+                        .build())
                 .build());
     }
 
@@ -207,6 +211,9 @@ public class OauthController {
                 .clientId(githubBody.getClientId())
                 .clientSecret(githubBody.getClientSecret())
                 .redirectUri(githubBody.getRedirectUri())
+                .httpConfig(HttpConfig.builder()
+                        .timeout(60000) // 60秒超时
+                        .build())
                 .build());
     }
 }

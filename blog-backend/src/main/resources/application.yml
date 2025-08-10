@@ -72,7 +72,7 @@ spring:
   mail:
     host: smtp.qq.com
     username:  haibaraiii@foxmail.com
-    password:  miyfztrqalctbhgf
+    password:  nznzfftfblfncabg
     properties:
       mail:
         smtp:
