@@ -176,7 +176,7 @@ http_pool:
   validate_after_inactivity: 2000
 # 链接 minio
 minio:
-  endpoint: http://45.204.4.56:9000
+  endpoint: https://minio.haikari.top
   accessKey: minioadmin
   secretKey: minioadmin123
   bucketName: haibara-blog
