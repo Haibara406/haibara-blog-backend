@@ -135,7 +135,7 @@ public class ValidationConstants {
 
     public static final String WEBSITE_DESCRIPTION_TOO_LONG = "网站描述不能超过30个字符";
 
-    public static final String WEBSITE_BACKGROUND_TOO_LONG = "网站背景不能超过100个字符";
+    public static final String WEBSITE_BACKGROUND_TOO_LONG = "网站背景不能超过200个字符";
 
     public static final String LINK_ID_NOT_NULL = "友链id不能为空";
 
