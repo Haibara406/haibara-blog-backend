@@ -55,6 +55,42 @@ public class SecurityUtils {
     }
 
     /**
+     * 检查用户是否拥有指定权限
+     * @param authority 权限字符串
+     * @return 是否拥有权限
+     */
+    public static boolean hasAuthority(String authority) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return false;
+        }
+        return authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(authority));
+    }
+    
+    /**
+     * 检查用户是否拥有任意一个指定权限
+     * @param authorities 权限字符串数组
+     * @return 是否拥有任意一个权限
+     */
+    public static boolean hasAnyAuthority(String... authorities) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return false;
+        }
+        List<String> userAuthorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+        
+        for (String authority : authorities) {
+            if (userAuthorities.contains(authority)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * 获取request
      * @return request
      */

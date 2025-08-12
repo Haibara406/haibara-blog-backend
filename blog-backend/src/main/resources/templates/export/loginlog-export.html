@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>登录日志列表导出</title>
+    <style>
+        /* 基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'SimHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+        
+        /* 容器样式 */
+        .export-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        /* 头部样式 */
+        .header {
+            background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: 300;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 信息栏样式 */
+        .export-info {
+            background-color: #f8f9fc;
+            padding: 25px 30px;
+            border-bottom: 1px solid #e3e6f0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .info-item .icon {
+            width: 20px;
+            height: 20px;
+            background-color: #43cea2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .info-item .label {
+            font-weight: 600;
+            color: #5a5c69;
+        }
+        
+        .info-item .value {
+            font-weight: 400;
+            color: #858796;
+        }
+        
+        /* 表格容器 */
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+        
+        /* 表格样式 */
+        .export-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .export-table thead {
+            background: linear-gradient(135deg, #185a9d 0%, #43cea2 100%);
+            color: white;
+        }
+        
+        .export-table th {
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .export-table th:last-child {
+            border-right: none;
+        }
+        
+        .export-table tbody tr {
+            transition: all 0.2s ease;
+        }
+        
+        .export-table tbody tr:nth-child(even) {
+            background-color: #f8f9fc;
+        }
+        
+        .export-table tbody tr:hover {
+            background-color: #e8f5e8;
+        }
+        
+        .export-table td {
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid #e3e6f0;
+            vertical-align: middle;
+        }
+        
+        /* 序号列样式 */
+        .row-number {
+            font-weight: 600;
+            color: #5a5c69;
+            background-color: #f1f3f4;
+            font-size: 12px;
+        }
+        
+        /* 用户名样式 */
+        .username {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        /* IP地址样式 */
+        .ip-address {
+            font-family: 'Courier New', monospace;
+            color: #43cea2;
+            font-size: 11px;
+        }
+        
+        /* 地址样式 */
+        .address {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 11px;
+            color: #6c757d;
+        }
+        
+        /* 浏览器和系统样式 */
+        .browser-os {
+            font-size: 11px;
+            color: #495057;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* 登录类型样式 */
+        .login-type {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .type-frontend {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .type-backend {
+            background-color: #9b59b6;
+            color: white;
+        }
+        
+        .type-illegal {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        /* 登录状态样式 */
+        .status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .status-success {
+            background-color: #1cc88a;
+            color: white;
+        }
+        
+        .status-failed {
+            background-color: #e74a3b;
+            color: white;
+        }
+        
+        /* 日期样式 */
+        .date-time {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: #6c757d;
+        }
+        
+        /* 页脚样式 */
+        .footer {
+            background-color: #f8f9fc;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #858796;
+            border-top: 1px solid #e3e6f0;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .export-info {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .table-container {
+                padding: 15px;
+            }
+            
+            .export-table {
+                font-size: 11px;
+            }
+            
+            .export-table th,
+            .export-table td {
+                padding: 6px 4px;
+            }
+        }
+        
+        /* 打印样式 */
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+            
+            .export-container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            
+            .header {
+                background: #43cea2 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .export-container {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="export-container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>登录日志列表导出</h1>
+            <div class="subtitle">Login Log Export Report</div>
+        </div>
+        
+        <!-- 导出信息 -->
+        <div class="export-info">
+            <div class="info-item">
+                <div class="icon">⏰</div>
+                <div class="label">导出时间：</div>
+                <div class="value" th:text="${exportTime}">2025-01-21 14:30:25</div>
+            </div>
+            <div class="info-item">
+                <div class="icon">📊</div>
+                <div class="label">数据总数：</div>
+                <div class="value"><span th:text="${totalCount}">500</span> 条</div>
+            </div>
+            <div class="info-item">
+                <div class="icon">📁</div>
+                <div class="label">文件名称：</div>
+                <div class="value" th:text="${fileName}">登录日志列表</div>
+            </div>
+            <div class="info-item">
+                <div class="icon">🏷️</div>
+                <div class="label">业务类型：</div>
+                <div class="value" th:text="${businessType}">登录日志</div>
+            </div>
+        </div>
+        
+        <!-- 表格容器 -->
+        <div class="table-container">
+            <table class="export-table">
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>日志ID</th>
+                        <th>用户名</th>
+                        <th>登录IP</th>
+                        <th>登录地址</th>
+                        <th>浏览器</th>
+                        <th>操作系统</th>
+                        <th>登录类型</th>
+                        <th>登录状态</th>
+                        <th>登录时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="loginLog,iterStat : ${loginLogList}">
+                        <td class="row-number" th:text="${iterStat.count}">1</td>
+                        <td th:text="${loginLog.id}">1</td>
+                        <td class="username" th:text="${loginLog.userName}">admin</td>
+                        <td class="ip-address" th:text="${loginLog.ip}">192.168.1.100</td>
+                        <td class="address" 
+                            th:text="${loginLog.address}"
+                            th:title="${loginLog.address}">
+                            北京市朝阳区
+                        </td>
+                        <td class="browser-os" 
+                            th:text="${loginLog.browser}"
+                            th:title="${loginLog.browser}">
+                            Chrome
+                        </td>
+                        <td class="browser-os" 
+                            th:text="${loginLog.os}"
+                            th:title="${loginLog.os}">
+                            Windows 10
+                        </td>
+                        <td>
+                            <span th:class="${loginLog.type == 0 ? 'login-type type-frontend' : 
+                                           loginLog.type == 1 ? 'login-type type-backend' : 
+                                           'login-type type-illegal'}"
+                                  th:text="${loginLog.type == 0 ? '前台登录' : 
+                                           loginLog.type == 1 ? '后台登录' : '非法登录'}">
+                                后台登录
+                            </span>
+                        </td>
+                        <td>
+                            <span th:class="${loginLog.state == 0 ? 'status status-success' : 'status status-failed'}"
+                                  th:text="${loginLog.state == 0 ? '成功' : '失败'}">
+                                成功
+                            </span>
+                        </td>
+                        <td class="date-time" 
+                            th:text="${#dates.format(loginLog.loginTime, 'yyyy-MM-dd HH:mm:ss')}">
+                            2025-01-21 14:30:25
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 页脚 -->
+        <div class="footer">
+            <p>本报表由系统自动生成 | Haibara-Blog-Admin-System | 导出时间：<span th:text="${exportTime}"></span></p>
+        </div>
+    </div>
+</body>
+</html>

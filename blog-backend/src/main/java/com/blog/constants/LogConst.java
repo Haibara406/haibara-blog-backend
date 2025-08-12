@@ -32,4 +32,6 @@ public class LogConst {
     public static final String BINDING = "绑定";
 
     public static final String MONITOR = "监控";
+    
+    public static final String EXPORT = "导出";
 }

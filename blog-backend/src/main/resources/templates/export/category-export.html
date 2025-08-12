@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>分类列表导出</title>
+    <style>
+        /* 基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'SimHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+        
+        /* 容器样式 */
+        .export-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        /* 头部样式 */
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: 300;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 信息栏样式 */
+        .export-info {
+            background-color: #f8f9fc;
+            padding: 25px 30px;
+            border-bottom: 1px solid #e3e6f0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .info-item .icon {
+            width: 20px;
+            height: 20px;
+            background-color: #00f2fe;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .info-item .label {
+            font-weight: 600;
+            color: #5a5c69;
+        }
+        
+        .info-item .value {
+            font-weight: 400;
+            color: #858796;
+        }
+        
+        /* 表格容器 */
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+        
+        /* 表格样式 */
+        .export-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .export-table thead {
+            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            color: white;
+        }
+        
+        .export-table th {
+            padding: 15px 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .export-table th:last-child {
+            border-right: none;
+        }
+        
+        .export-table tbody tr {
+            transition: all 0.2s ease;
+        }
+        
+        .export-table tbody tr:nth-child(even) {
+            background-color: #f8f9fc;
+        }
+        
+        .export-table tbody tr:hover {
+            background-color: #eaecf4;
+            transform: scale(1.01);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .export-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e3e6f0;
+            vertical-align: middle;
+        }
+        
+        /* 序号列样式 */
+        .row-number {
+            font-weight: 600;
+            color: #5a5c69;
+            background-color: #f1f3f4;
+            font-size: 12px;
+        }
+        
+        /* 分类名称样式 */
+        .category-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+        
+        /* 分类ID样式 */
+        .category-id {
+            font-family: 'Courier New', monospace;
+            color: #00f2fe;
+            background-color: #f3f4f6;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        /* 日期样式 */
+        .date-time {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        
+        /* 页脚样式 */
+        .footer {
+            background-color: #f8f9fc;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #858796;
+            border-top: 1px solid #e3e6f0;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .export-info {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .table-container {
+                padding: 15px;
+            }
+            
+            .export-table {
+                font-size: 12px;
+            }
+            
+            .export-table th,
+            .export-table td {
+                padding: 8px 6px;
+            }
+        }
+        
+        /* 打印样式 */
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+            
+            .export-container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            
+            .header {
+                background: #00f2fe !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .export-table tbody tr:hover {
+                transform: none;
+                box-shadow: none;
+            }
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .export-container {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="export-container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>分类管理列表导出</h1>
+            <div class="subtitle">Category Management Export Report</div>
+        </div>
+        
+        <!-- 导出信息 -->
+        <div class="export-info">
+            <div class="info-item">
+                <div class="icon">⏰</div>
+                <div class="label">导出时间：</div>
+                <div class="value" th:text="${exportTime}">2025-01-21 14:30:25</div>
+            </div>
+            <div class="info-item">
+                <div class="icon">📊</div>
+                <div class="label">数据总数：</div>
+                <div class="value"><span th:text="${totalCount}">8</span> 条</div>
+            </div>
+            <div class="info-item">
+                <div class="icon">📁</div>
+                <div class="label">文件名称：</div>
+                <div class="value" th:text="${fileName}">分类列表</div>
+            </div>
+            <div class="info-item">
+                <div class="icon">🏷️</div>
+                <div class="label">业务类型：</div>
+                <div class="value" th:text="${businessType}">分类管理</div>
+            </div>
+        </div>
+        
+        <!-- 表格容器 -->
+        <div class="table-container">
+            <table class="export-table">
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>分类ID</th>
+                        <th>分类名称</th>
+                        <th>创建时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="category,iterStat : ${categoryList}">
+                        <td class="row-number" th:text="${iterStat.count}">1</td>
+                        <td>
+                            <span class="category-id" th:text="${category.id}">1</span>
+                        </td>
+                        <td class="category-name" th:text="${category.categoryName}">技术分享</td>
+                        <td class="date-time" 
+                            th:text="${#dates.format(category.createTime, 'yyyy-MM-dd HH:mm:ss')}">
+                            2025-01-21 14:30:25
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 页脚 -->
+        <div class="footer">
+            <p>本报表由系统自动生成 | Haibara-Blog-Admin-System | 导出时间：<span th:text="${exportTime}"></span></p>
+        </div>
+    </div>
+</body>
+</html>
