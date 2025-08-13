@@ -96,7 +96,9 @@ public class LogManagementController {
     @Operation(summary = "手动清理登录日志")
     @Parameter(name = "keepCount", description = "保留的记录数量", required = true)
     @LogAnnotation(module = "日志管理", operation = "清理")
-    @AccessLimit(seconds = 60, maxCount = 1)
+    @AccessLimit(seconds = AccessLimitConst.DEFAULT_SECONDS,
+            maxCount = AccessLimitConst.MANUAL_CLEAN_LOGIN_LOG_MAX_COUNT)
+    @PostMapping("/cleanup/login-log")
     public ResponseResult<String> cleanupLoginLogs(@RequestParam("keepCount") int keepCount) {
         if (keepCount <= 0) {
             return ResponseResult.failure(ErrorConst.LOGIN_LOG_KEEP_COUNT_MUST_GT_ZERO);
