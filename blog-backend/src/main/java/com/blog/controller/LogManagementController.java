@@ -45,7 +45,7 @@ public class LogManagementController {
      *
      * @return 响应结果，包含日志统计信息
      */
-    @PreAuthorize("hasAnyAuthority('system:log:manage')")
+    @PreAuthorize("hasAnyAuthority('system:log:statistics')")
     @Operation(summary = "获取日志统计信息")
     @AccessLimit(seconds = AccessLimitConst.DEFAULT_SECONDS, 
                 maxCount = AccessLimitConst.DEFAULT_MAX_COUNT)
@@ -69,7 +69,7 @@ public class LogManagementController {
      *             <li>失败时返回错误信息</li>
      *         </ul>
      */
-    @PreAuthorize("hasAnyAuthority('system:log:manage')")
+    @PreAuthorize("hasAnyAuthority('system:log:cleanup')")
     @Operation(summary = "手动执行日志清理")
     @LogAnnotation(module = "日志管理", operation = "清理")
     @AccessLimit(seconds = AccessLimitConst.DEFAULT_SECONDS,
@@ -92,7 +92,7 @@ public class LogManagementController {
      * @param keepCount 保留的记录数量，必须大于0，建议不少于1000条
      * @return 响应结果，包含删除的记录数量
      */
-    @PreAuthorize("hasAnyAuthority('system:log:manage')")
+    @PreAuthorize("hasAnyAuthority('system:log:cleanup:login')")
     @Operation(summary = "手动清理登录日志")
     @Parameter(name = "keepCount", description = "保留的记录数量", required = true)
     @LogAnnotation(module = "日志管理", operation = "清理")
@@ -122,7 +122,7 @@ public class LogManagementController {
      * @param keepCount 保留的记录数量，必须大于0，建议不少于2000条
      * @return 响应结果，包含删除的记录数量
      */
-    @PreAuthorize("hasAnyAuthority('system:log:manage')")
+    @PreAuthorize("hasAnyAuthority('system:log:cleanup:operate')")
     @Operation(summary = "手动清理操作日志")
     @Parameter(name = "keepCount", description = "保留的记录数量", required = true)
     @LogAnnotation(module = "日志管理", operation = "清理")
