@@ -2,6 +2,7 @@ package com.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.blog.constants.ErrorConst;
+import com.blog.constants.LogConst;
 import com.blog.domain.entity.Log;
 import com.blog.mapper.LogMapper;
 import com.blog.mapper.LoginLogMapper;
@@ -12,10 +13,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.annotation.PostConstruct;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 日志清理服务实现
@@ -54,10 +59,100 @@ public class LogCleanupServiceImpl implements LogCleanupService {
     
     /**
      * 受保护的操作类型（不会被自动清理）
+     * 基于LogConst中定义的重要操作类型，这些操作涉及系统安全、权限管理、数据修改等关键业务
+     * 
+     * 受保护的操作包括：
+     * - 修改操作：重要的系统变更记录
+     * - 删除操作：重要的数据删除记录
+     * - 审核操作：重要的审核决策记录
+     * - 授权操作：权限相关操作记录
+     * - 重置密码：安全相关操作记录
+     * - 确认邮件：安全相关操作记录
+     * - 绑定操作：用户账户相关操作记录
      */
     private static final List<String> PROTECTED_OPERATIONS = Arrays.asList(
-            "登录", "注册", "修改密码", "权限变更", "角色分配", "系统配置"
+            LogConst.UPDATE,        // 修改 - 重要的系统变更
+            LogConst.DELETE,        // 删除 - 重要的数据删除
+            LogConst.APPROVE,       // 审核 - 重要的审核决策
+            LogConst.GRANT,         // 授权 - 权限相关操作
+            LogConst.RESET_PASSWORD,// 重置密码 - 安全相关操作
+            LogConst.RESET_CONFIRM, // 确认邮件 - 安全相关操作
+            LogConst.BINDING        // 绑定 - 用户账户相关操作
     );
+    
+    /**
+     * 非保护的操作类型（可以被自动清理）
+     * 这些操作通常是日常的、可重复的、对系统影响较小的操作
+     * 
+     * 非保护的操作包括：
+     * - 新增操作：常规的数据新增
+     * - 获取操作：查询类操作
+     * - 搜索操作：搜索查询操作  
+     * - 上传图片：文件上传操作
+     * - 邮件发送：邮件通知操作
+     * - 监控操作：系统监控记录
+     * - 导出操作：数据导出操作
+     * - 清理操作：系统维护操作
+     */
+    private static final List<String> NON_PROTECTED_OPERATIONS = Arrays.asList(
+            LogConst.INSERT,        // 新增 - 常规的数据新增
+            LogConst.GET,           // 获取 - 查询类操作
+            LogConst.SEARCH,        // 搜索 - 搜索查询操作
+            LogConst.UPLOAD_IMAGE,  // 上传图片 - 文件上传操作
+            LogConst.EMAIL_SEND,    // 邮件发送 - 邮件通知操作
+            LogConst.MONITOR,       // 监控 - 系统监控记录
+            LogConst.EXPORT,        // 导出 - 数据导出操作
+            LogConst.CLEANUP        // 清理 - 系统维护操作
+    );
+    
+    /**
+     * 服务初始化后验证日志类型分类
+     */
+    @PostConstruct
+    public void init() {
+        validateLogTypeClassification();
+    }
+    
+    /**
+     * 验证日志操作类型分类的完整性
+     * 确保LogConst中所有定义的操作类型都被正确分类为保护或非保护
+     */
+    private void validateLogTypeClassification() {
+        Set<String> allLogConstOperations = Set.of(
+                LogConst.UPDATE, LogConst.INSERT, LogConst.DELETE, LogConst.APPROVE,
+                LogConst.GET, LogConst.GRANT, LogConst.SEARCH, LogConst.UPLOAD_IMAGE,
+                LogConst.EMAIL_SEND, LogConst.RESET_PASSWORD, LogConst.RESET_CONFIRM,
+                LogConst.BINDING, LogConst.MONITOR, LogConst.EXPORT, LogConst.CLEANUP
+        );
+        
+        Set<String> classifiedOperations = new HashSet<>();
+        classifiedOperations.addAll(PROTECTED_OPERATIONS);
+        classifiedOperations.addAll(NON_PROTECTED_OPERATIONS);
+        
+        // 检查是否有未分类的操作
+        Set<String> unclassifiedOperations = new HashSet<>(allLogConstOperations);
+        unclassifiedOperations.removeAll(classifiedOperations);
+        
+        if (!unclassifiedOperations.isEmpty()) {
+            log.warn("发现未分类的日志操作类型: {}", unclassifiedOperations);
+        }
+        
+        // 检查是否有重复分类的操作
+        Set<String> duplicateOperations = new HashSet<>();
+        for (String operation : PROTECTED_OPERATIONS) {
+            if (NON_PROTECTED_OPERATIONS.contains(operation)) {
+                duplicateOperations.add(operation);
+            }
+        }
+        
+        if (!duplicateOperations.isEmpty()) {
+            log.error("发现重复分类的日志操作类型: {}", duplicateOperations);
+        }
+        
+        log.info("日志操作类型分类验证完成 - 受保护操作: {}, 非保护操作: {}, 总计: {}", 
+                PROTECTED_OPERATIONS.size(), NON_PROTECTED_OPERATIONS.size(), 
+                allLogConstOperations.size());
+    }
     
     /**
      * 清理登录日志
@@ -203,6 +298,10 @@ public class LogCleanupServiceImpl implements LogCleanupService {
     public String performFullCleanup() {
         try {
             log.info("========== 开始执行自动日志清理任务 ==========");
+            log.info("使用基于LogConst的日志操作类型分类策略");
+            log.info("受保护操作类型: {}", PROTECTED_OPERATIONS);
+            log.info("非保护操作类型: {}", NON_PROTECTED_OPERATIONS);
+            
             String startTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             
             // 记录清理前的统计信息
@@ -220,7 +319,7 @@ public class LogCleanupServiceImpl implements LogCleanupService {
             log.info("清理后统计: {}", afterStats);
             
             String result = String.format(
-                "日志自动清理完成 [%s] - 删除登录日志: %d条, 删除操作日志: %d条",
+                "日志自动清理完成 [%s] - 删除登录日志: %d条, 删除操作日志: %d条 (基于LogConst分类策略)",
                 startTime, deletedLoginLogs, deletedOperateLogs
             );
             
