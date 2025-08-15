@@ -344,9 +344,24 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         if (commentMapper.selectCount(new LambdaQueryWrapper<Comment>().eq(Comment::getParentId, id)) > 0) {
             return ResponseResult.failure(ErrorConst.COMMENT_HAS_REPLY);
         }
+
+        // 先获取评论信息，用于更新缓存
+        Comment comment = commentMapper.selectById(id);
+        if (comment == null) {
+            return ResponseResult.failure();
+        }
+
         if (commentMapper.deleteById(id) > 0) {
             // 删除评论的点赞
             likeMapper.delete(new LambdaQueryWrapper<Like>().eq(Like::getType, LikeEnum.LIKE_TYPE_COMMENT.getType()).and(a -> a.in(Like::getTypeId, id)));
+
+            // 如果是文章评论且已审核通过，需要减少文章评论数缓存
+            if (Objects.equals(comment.getType(), CommentEnum.COMMENT_TYPE_ARTICLE.getType())
+                && Objects.equals(comment.getIsCheck(), SQLConst.COMMENT_IS_CHECK)) {
+                redisCache.incrementCacheMapValue(RedisConst.ARTICLE_COMMENT_COUNT, comment.getTypeId().toString(), -1);
+                log.debug("删除文章评论成功，已更新评论数缓存，文章ID: {}", comment.getTypeId());
+            }
+
             return ResponseResult.success();
         }
         return ResponseResult.failure();
