@@ -39,6 +39,9 @@ public class FileUploadUtils {
     @Value("${minio.endpoint}")
     private String endpoint;
 
+    @Value("${minio.url}")
+    private String url;
+
     /**
      * 上传文件
      *
@@ -59,7 +62,7 @@ public class FileUploadUtils {
                     .stream(stream, file.getSize(), -1)
                     .build();
             client.putObject(args);
-            return endpoint + "/" + bucketName + "/" + uploadEnum.getDir() + name + "." + getFileExtension(file.getOriginalFilename());
+            return url + "/" + bucketName + "/" + uploadEnum.getDir() + name + "." + getFileExtension(file.getOriginalFilename());
         }
         log.error("--------------------上传文件格式不正确--------------------");
         throw new FileUploadException("上传文件类型错误");
@@ -84,7 +87,7 @@ public class FileUploadUtils {
                     .stream(stream, file.getSize(), -1)
                     .build();
             client.putObject(args);
-            return endpoint + "/" + bucketName + "/" + uploadEnum.getDir() + fileName + "." + getFileExtension(file.getOriginalFilename());
+            return url + "/" + bucketName + "/" + uploadEnum.getDir() + fileName + "." + getFileExtension(file.getOriginalFilename());
         }
         log.error("--------------------上传文件格式不正确--------------------");
         throw new FileUploadException("上传文件类型错误");
@@ -109,7 +112,7 @@ public class FileUploadUtils {
                     .stream(stream, file.getSize(), -1)
                     .build();
             client.putObject(args);
-            return endpoint + "/" + bucketName + "/" + uploadEnum.getDir() + dir + "/" + fileName + "." + getFileExtension(file.getOriginalFilename());
+            return url + "/" + bucketName + "/" + uploadEnum.getDir() + dir + "/" + fileName + "." + getFileExtension(file.getOriginalFilename());
         }
         log.error("--------------------上传文件格式不正确--------------------");
         throw new FileUploadException("上传文件类型错误");
