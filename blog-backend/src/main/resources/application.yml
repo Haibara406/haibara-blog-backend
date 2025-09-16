@@ -12,7 +12,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://45.204.4.56:3306/haibara_blog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
     username: root
-    password: root123
+    password: Ww249260523..
     hikari:
       # 连接池最大连接数
       maximum-pool-size: 20
@@ -38,6 +38,7 @@ spring:
       host: 45.204.4.56
       timeout: 10000
       database: 1
+      password: Ww249260523..
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
@@ -45,8 +46,8 @@ spring:
   rabbitmq:
     host: 45.204.4.56
     port: 5672
-    username: admin
-    password: admin123
+    username: haibara
+    password: Ww249260523..
     listener:
       simple:
         retry:
@@ -103,7 +104,7 @@ spring:
               driver: com.mysql.cj.jdbc.Driver
               URL: jdbc:mysql://45.204.4.56:3306/haibara_blog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
               user: root
-              password: root123
+              password: Ww249260523..
 mail:
   link:
     apply:
@@ -181,8 +182,8 @@ http_pool:
 minio:
   endpoint: http://45.204.4.56:9000
   url: https://minio.haikari.top
-  accessKey: minioadmin
-  secretKey: minioadmin123
+  accessKey: haibara
+  secretKey: Ww249260523..
   bucketName: haibara-blog
 # 日志清理配置
 log:
