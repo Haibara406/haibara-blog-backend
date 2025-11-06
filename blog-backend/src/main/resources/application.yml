@@ -10,7 +10,8 @@ spring:
       expire: 7
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://myblog-mysql:3306/haibara_blog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    # 8.156.75.132
+    url: jdbc:mysql://8.156.75.132:3306/haibara_blog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
     username: root
     password: Ww249260523..
     hikari:
@@ -35,7 +36,7 @@ spring:
   data:
     redis:
       port: 6379
-      host: myblog-redis
+      host: 8.156.75.132
       timeout: 10000
       database: 1
       password: Ww249260523..
@@ -44,7 +45,7 @@ spring:
     time-zone: GMT+8
 
   rabbitmq:
-    host: myblog-rabbitmq
+    host: 154.94.235.178
     port: 5672
     username: haibara
     password: Ww249260523..
@@ -102,7 +103,7 @@ spring:
           dataSource:
             quartz_jobs:
               driver: com.mysql.cj.jdbc.Driver
-              url: jdbc:mysql://myblog-mysql:3306/haibara_blog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+              url: jdbc:mysql://154.94.235.178:3306/haibara_blog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
               username: root
               password: Ww249260523..
 mail:
@@ -180,7 +181,7 @@ http_pool:
   validate_after_inactivity: 2000
 # 链接 minio
 minio:
-  endpoint: http://myblog-minio:9000
+  endpoint: http://154.94.235.178:9000
   url: https://minio.haikari.top
   accessKey: haibara
   secretKey: Ww249260523..
