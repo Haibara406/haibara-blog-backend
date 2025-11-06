@@ -1,5 +1,5 @@
 server:
-  port: 8062
+  port: 8066
 spring:
   profiles:
     active: "@profiles.active@"
@@ -103,7 +103,7 @@ spring:
           dataSource:
             quartz_jobs:
               driver: com.mysql.cj.jdbc.Driver
-              url: jdbc:mysql://154.94.235.178:3306/haibara_blog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+              url: jdbc:mysql://8.156.75.132:3306/haibara_blog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
               username: root
               password: Ww249260523..
 mail:

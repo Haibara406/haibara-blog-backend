@@ -25,6 +25,24 @@ certbot certonly --webroot \
   --non-interactive
 ```
 
+# 临时nginx配置：
+cat > /data/nginx/conf/conf.d/http-only.conf << 'EOF'
+server {
+listen 80;
+server_name haikari.top www.haikari.top sherry.haikari.top blog.admin.haikari.top minio.haikari.top;
+
+    location /.well-known/acme-challenge/ {
+        root /usr/share/nginx/html;
+        try_files $uri =404;
+    }
+    
+    location / {
+        return 200 "Waiting for SSL certificate...";
+        add_header Content-Type text/plain;
+    }
+}
+EOF
+
 ## 3. 复制证书到Nginx目录
 ```bash
 # 创建ssl目录
@@ -35,16 +53,16 @@ cp /etc/letsencrypt/live/haikari.top/fullchain.pem /data/nginx/ssl/haikari.top.c
 cp /etc/letsencrypt/live/haikari.top/privkey.pem /data/nginx/ssl/haikari.top.key
 
 # 复制sherry.haikari.top证书
-cp /etc/letsencrypt/live/sherry.haikari.top/fullchain.pem /data/nginx/ssl/sherry.haikari.top.crt
-cp /etc/letsencrypt/live/sherry.haikari.top/privkey.pem /data/nginx/ssl/sherry.haikari.top.key
+ln -s /data/nginx/ssl/haikari.top.crt /data/nginx/ssl/sherry.haikari.top.crt
+ln -s /data/nginx/ssl/haikari.top.key /data/nginx/ssl/sherry.haikari.top.key
 
 # 复制blog.admin.haikari.top证书
-cp /etc/letsencrypt/live/blog.admin.haikari.top/fullchain.pem /data/nginx/ssl/blog.admin.haikari.top.crt
-cp /etc/letsencrypt/live/blog.admin.haikari.top/privkey.pem /data/nginx/ssl/blog.admin.haikari.top.key
+ln -s /data/nginx/ssl/haikari.top.crt /data/nginx/ssl/blog.admin.haikari.top.crt
+ln -s /data/nginx/ssl/haikari.top.key /data/nginx/ssl/blog.admin.haikari.top.key
 
 # 复制minio.haikari.top证书
-cp /etc/letsencrypt/live/minio.haikari.top/fullchain.pem /data/nginx/ssl/minio.haikari.top.crt
-cp /etc/letsencrypt/live/minio.haikari.top/privkey.pem /data/nginx/ssl/minio.haikari.top.key
+ln -s /data/nginx/ssl/haikari.top.crt /data/nginx/ssl/minio.haikari.top.crt
+ln -s /data/nginx/ssl/haikari.top.key /data/nginx/ssl/minio.haikari.top.key
 
 # 设置权限
 chmod 644 /data/nginx/ssl/*.crt
@@ -63,15 +81,17 @@ cat > /root/renew-ssl.sh << 'EOF'
 #!/bin/bash
 certbot renew --quiet
 
-# 复制更新后的证书
+# 只需要复制一套证书
 cp /etc/letsencrypt/live/haikari.top/fullchain.pem /data/nginx/ssl/haikari.top.crt
 cp /etc/letsencrypt/live/haikari.top/privkey.pem /data/nginx/ssl/haikari.top.key
-cp /etc/letsencrypt/live/sherry.haikari.top/fullchain.pem /data/nginx/ssl/sherry.haikari.top.crt
-cp /etc/letsencrypt/live/sherry.haikari.top/privkey.pem /data/nginx/ssl/sherry.haikari.top.key
-cp /etc/letsencrypt/live/blog.admin.haikari.top/fullchain.pem /data/nginx/ssl/blog.admin.haikari.top.crt
-cp /etc/letsencrypt/live/blog.admin.haikari.top/privkey.pem /data/nginx/ssl/blog.admin.haikari.top.key
-cp /etc/letsencrypt/live/minio.haikari.top/fullchain.pem /data/nginx/ssl/minio.haikari.top.crt
-cp /etc/letsencrypt/live/minio.haikari.top/privkey.pem /data/nginx/ssl/minio.haikari.top.key
+
+# 如果使用方案二，再复制其他副本
+cp /etc/letsencrypt/live/haikari.top/fullchain.pem /data/nginx/ssl/sherry.haikari.top.crt
+cp /etc/letsencrypt/live/haikari.top/privkey.pem /data/nginx/ssl/sherry.haikari.top.key
+cp /etc/letsencrypt/live/haikari.top/fullchain.pem /data/nginx/ssl/blog.admin.haikari.top.crt
+cp /etc/letsencrypt/live/haikari.top/privkey.pem /data/nginx/ssl/blog.admin.haikari.top.key
+cp /etc/letsencrypt/live/haikari.top/fullchain.pem /data/nginx/ssl/minio.haikari.top.crt
+cp /etc/letsencrypt/live/haikari.top/privkey.pem /data/nginx/ssl/minio.haikari.top.key
 
 # 重启nginx
 docker restart nginx
