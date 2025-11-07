@@ -89,8 +89,11 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
   quartz:
-    # 将 Quartz 持久化方式修改为 jdbc，使用 Spring 的主数据源
+    # 使用 JDBC 持久化，Spring Boot 自动配置主数据源
     job-store-type: jdbc
+    jdbc:
+      # 表已存在，不需要初始化
+      initialize-schema: never
     properties:
       org:
         quartz:
@@ -98,8 +101,12 @@ spring:
             # 实例节点 ID 自动生成
             instanceId: AUTO
           jobStore:
-            class: org.quartz.impl.jdbcjobstore.JobStoreTX
-            # 不指定 dataSource，默认使用 Spring 的主数据源
+            # Quartz 表前缀
+            tablePrefix: QRTZ_
+            # 非集群模式
+            isClustered: false
+            # 容错时间阈值(毫秒)
+            misfireThreshold: 60000
 mail:
   link:
     apply:
