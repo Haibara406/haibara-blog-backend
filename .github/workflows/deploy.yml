@@ -93,6 +93,14 @@ jobs:
               --name haibara-blog-backend \
               -p 8066:8066 \
               -v /app/logs:/app/logs \
+              -e SPRING_PROFILES_ACTIVE=prod \
+              -e SPRING_DATASOURCE_URL=jdbc:mysql://8.156.75.132:3306/haibara_blog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai \
+              -e SPRING_DATASOURCE_USERNAME=root \
+              -e SPRING_DATASOURCE_PASSWORD=Ww249260523.. \
+              -e SPRING_DATA_REDIS_HOST=8.156.75.132 \
+              -e SPRING_DATA_REDIS_PASSWORD=Ww249260523.. \
+              -e SPRING_RABBITMQ_HOST=154.94.235.178 \
+              -e SPRING_RABBITMQ_PASSWORD=Ww249260523.. \
               --restart unless-stopped \
               --log-opt max-size=100m \
               --log-opt max-file=5 \
