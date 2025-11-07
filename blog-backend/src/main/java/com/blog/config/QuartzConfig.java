@@ -4,12 +4,14 @@ import com.blog.quartz.LogCleanupTask;
 import com.blog.quartz.RefreshTheCache;
 import org.quartz.*;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author haibara
  * @description Quartz配置类
  * @since 2025/7/27 16:36
  */
+@Configuration
 public class QuartzConfig {
     
     /**
