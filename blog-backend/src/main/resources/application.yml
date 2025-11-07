@@ -89,7 +89,7 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
   quartz:
-    # 将 Quartz 持久化方式修改为 jdbc
+    # 将 Quartz 持久化方式修改为 jdbc，使用 Spring 的主数据源
     job-store-type: jdbc
     properties:
       org:
@@ -99,13 +99,7 @@ spring:
             instanceId: AUTO
           jobStore:
             class: org.quartz.impl.jdbcjobstore.JobStoreTX
-            dataSource: quartz_jobs
-          dataSource:
-            quartz_jobs:
-              driver: com.mysql.cj.jdbc.Driver
-              url: jdbc:mysql://8.156.75.132:3306/haibara_blog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
-              username: root
-              password: Ww249260523..
+            # 不指定 dataSource，默认使用 Spring 的主数据源
 mail:
   link:
     apply:
